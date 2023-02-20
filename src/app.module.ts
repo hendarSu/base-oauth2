@@ -1,13 +1,23 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { OrmModule } from './configuration/orm/orm.module';
+import { ResponseTimeInterceptor } from './common/interceptors/response-time-interceptor';
+import { OrmModule } from './libs/orm/orm.module';
 
 @Module({
   imports: [
-    OrmModule
+    OrmModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [{
+    provide: APP_INTERCEPTOR,
+    useClass: ResponseTimeInterceptor
+  },
+    AppService
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+  }
+}
